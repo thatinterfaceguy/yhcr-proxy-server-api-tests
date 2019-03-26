@@ -1,0 +1,10 @@
+version: "2"
+services:
+
+ newman:
+  image: postman/newman:ubuntu
+  container_name: newman
+  volumes:
+    - C:\Repos\yhcr-proxy-server-api-tests\yhcr-proxy-server-api-tests\tests:/etc/newman
+  command:
+    run yhcr-local-proxy-server-tests.json -e yhcr-proxy-server-tests-environment.json -r junit,cli --reporter-json-export=yhcr-local-proxy-server-test-results.xml -k

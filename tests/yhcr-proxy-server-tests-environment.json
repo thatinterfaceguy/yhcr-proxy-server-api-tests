@@ -1,0 +1,48 @@
+{
+	"id": "5d00fdee-5fc2-4631-b774-c41722a2f66a",
+	"name": "YHCR-FHIR-PROXY-SERVERS",
+	"values": [
+		{
+			"key": "proxy_server_address",
+			"value": "http://host.docker.internal:57772",
+			"description": "",
+			"enabled": true
+		},
+		{
+			"key": "base_fhir_path",
+			"value": "/local/fhir/STU3",
+			"description": "",
+			"enabled": true
+		},
+		{
+			"key": "target_test_patient_id",
+			"value": "",
+			"description": "",
+			"enabled": true
+		},
+		{
+			"key": "firstPageResourceIds",
+			"value": "",
+			"enabled": true
+		},
+		{
+			"key": "last_page",
+			"value": "",
+			"enabled": true
+		},
+		{
+			"key": "next_page",
+			"value": "",
+			"description": "",
+			"enabled": true
+		},
+		{
+			"key": "nextPageResourceIds",
+			"value": "",
+			"enabled": true
+		}
+	],
+	"_postman_variable_scope": "environment",
+	"_postman_exported_at": "2019-03-26T13:55:59.070Z",
+	"_postman_exported_using": "Postman/7.0.6"
+}
