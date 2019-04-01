@@ -1763,7 +1763,7 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "{{proxy_server_address}}{{base_fhir_path}}/Encounter?patient=Patient/{{target_test_patient_id}}",
+							"raw": "{{proxy_server_address}}{{base_fhir_path}}/Encounter?subject:identifier=https://fhir.nhs.uk/Id/nhs-number|9657702070",
 							"host": [
 								"{{proxy_server_address}}{{base_fhir_path}}"
 							],
@@ -1772,8 +1772,8 @@
 							],
 							"query": [
 								{
-									"key": "patient",
-									"value": "Patient/{{target_test_patient_id}}"
+									"key": "subject:identifier",
+									"value": "https://fhir.nhs.uk/Id/nhs-number|9657702070"
 								}
 							]
 						}
@@ -3180,6 +3180,252 @@
 							],
 							"path": [
 								"Subscription"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Can create Patient",
+			"item": [
+				{
+					"name": "Can create a Patient resource",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "405981bd-74b1-4fee-b114-ff43b71e00ab",
+								"exec": [
+									"//Expect 201 created with location header, body of response to be a FHIR resource of expected resourceType and id has been assigned",
+									"pm.test(\"Can Create Patient - 201 returned\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test(\"Can Create Patient - Location is present\", function () {",
+									"    //Set API path for read...http://localhost:57772/local/fhir/STU3/Patient/2ea60e8a-d37b-4c56-8639-d7c5bd1f3d32/_history/1",
+									"    var resourceUrl = pm.response.headers.get(\"Location\").replace(\"/_history/1\", \"\");",
+									"    pm.environment.set(\"resource_url\", resourceUrl);",
+									"    pm.response.to.have.header(\"Location\");",
+									"});",
+									"",
+									"",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "894473ea-c452-4d94-b9f7-75191b290674",
+								"exec": [
+									"//Get the last NHS number, increment it and persist new value in env vars...",
+									"var nhsNumber = pm.environment.get(\"lastTestNHSNumber\");",
+									"nhsNumber++;",
+									"pm.environment.set(\"lastTestNHSNumber\", nhsNumber);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "accept",
+								"type": "text",
+								"value": "application/fhir+json"
+							},
+							{
+								"key": "content-type",
+								"type": "text",
+								"value": "application/fhir+json;charset=utf8"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n\t\"resourceType\": \"Patient\",\r\n\t\"identifier\": [{\r\n\t\t\"extension\": [{\r\n\t\t\t\"url\": \"https://fhir.hl7.org.uk/STU3/StructureDefinition/Extension-CareConnect-NHSNumberVerificationStatus-1\",\r\n\t\t\t\"valueCodeableConcept\": {\r\n\t\t\t\t\"coding\": [{\r\n\t\t\t\t\t\"system\": \"https://fhir.hl7.org.uk/STU3/CodeSystem/CareConnect-NHSNumberVerificationStatus-1\",\r\n\t\t\t\t\t\"code\": \"01\",\r\n\t\t\t\t\t\"display\": \"Number present and verified\"\r\n\t\t\t\t}]\r\n\t\t\t}\r\n\t\t}],\r\n\t\t\"system\": \"https://fhir.nhs.uk/Id/nhs-number\",\r\n\t\t\"value\": \"{{lastTestNHSNumber}}\"\r\n\t}],\r\n\t\"active\": true,\r\n\t\"name\": [{\r\n\t\t\"use\": \"official\",\r\n\t\t\"family\": \"ZZZTEST\",\r\n\t\t\"given\": [\r\n\t\t\t\"ZZZ\"\r\n\t\t],\r\n\t\t\"prefix\": [\r\n\t\t\t\"ZZZ\"\r\n\t\t]\r\n\t}],\r\n\t\"gender\": \"female\",\r\n\t\"birthDate\": \"1986-02-27\",\r\n\t\"address\": [{\r\n\t\t\"use\": \"home\",\r\n\t\t\"type\": \"physical\"\r\n\t}],\r\n\t\"maritalStatus\": {\r\n\t\t\"coding\": [{\r\n\t\t\t\"system\": \"http://hl7.org/fhir/v3/MaritalStatus\",\r\n\t\t\t\"code\": \"S\",\r\n\t\t\t\"display\": \"Never Married\"\r\n\t\t}]\r\n\t},\r\n\t\"generalPractitioner\": [{\r\n\t\t\"reference\": \"Practitioner/203529\",\r\n\t\t\"display\": \"Miss Nichole Gilbert\"\r\n\t}],\r\n\t\"managingOrganization\": {\r\n\t\t\"reference\": \"Organization/200268\",\r\n\t\t\"display\": \"HSCIC test Practice\"\r\n\t}\r\n}"
+						},
+						"url": {
+							"raw": "{{proxy_server_address}}{{base_fhir_path}}/Patient",
+							"host": [
+								"{{proxy_server_address}}{{base_fhir_path}}"
+							],
+							"path": [
+								"Patient"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Can read newly created Patient resource",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "405981bd-74b1-4fee-b114-ff43b71e00ab",
+								"exec": [
+									"pm.test(\"Can Read Patient - 200 returned\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Can Read Patient - Patient Resource is returned\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.resourceType).to.eql(\"Patient\");",
+									"});",
+									"",
+									"//Expectation: NHS number is exactly equal to that sent in the request body...",
+									"pm.test(\"Can Read Patient - Patient NHS Number equals that send in request body\", function () {",
+									"    var lastTestNHSNumber = pm.environment.get(\"lastTestNHSNumber\").toString();",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.identifier[0].value).to.equals(lastTestNHSNumber);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "894473ea-c452-4d94-b9f7-75191b290674",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "accept",
+								"type": "text",
+								"value": "application/fhir+json"
+							},
+							{
+								"key": "content-type",
+								"type": "text",
+								"value": "application/fhir+json;charset=utf8"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{resource_url}}",
+							"host": [
+								"{{resource_url}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Can search for Patient by name and gender",
+			"item": [
+				{
+					"name": "Can Search for Patient by name and gender",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "b84a2da2-9c8e-4c16-8e98-9cd67db958fc",
+								"exec": [
+									"//Expectation: 200 OK",
+									"pm.test(\"Can Search for Patient by name and gender - Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"//Expectation: Bundle is returned",
+									"pm.test(\"Can Search for Patient by name and gender - Bundle is returned\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.resourceType).to.eql(\"Bundle\");",
+									"});",
+									"//Expectation: Bundle size is exactly 1",
+									"pm.test(\"Can Search for Patient by name and gender - Bundle total is exactly 1\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.total).to.eql(1);",
+									"});",
+									"//Expectation: Entry collection size is exactly equal to Bundle total",
+									"pm.test(\"Can Search for Patient by name and gender - Bundle entry collection length === Bundle.total\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    var entries = jsonData.entry;",
+									"    pm.expect(entries.length).to.eql(jsonData.total);",
+									"});",
+									"//Expectation: A Patient Resource is at the first index in the entries collection...",
+									"pm.test(\"Can Search for Patient by name and gender - Bundle entry[0] is a Patient FHIR Resource\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    var entry = jsonData.entry[0].resource;",
+									"    pm.expect(entry.resourceType).to.eql(\"Patient\");",
+									"});",
+									"//Expectation: NHS number is exactly equal to that provided in _id query string parameter...",
+									"pm.test(\"Can Search for Patient by name and gender - Patient NHS Number equals that provided in _id query string parameter\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    var entry = jsonData.entry[0].resource;",
+									"    pm.expect(entry.identifier[0].value).to.eql(\"9657702070\");",
+									"});",
+									"//Expectation: Demographics exactly match that which is expected (as denoted in test comments)",
+									"pm.test(\"Can Search for Patient by name and gender - Demographics exactly match that which is expected\", function () {",
+									"    //Prefix, FamilyName, GivenName, Dob, Gender",
+									"    //Mrs, ALIZADEH, MUZNA, 19-Jul-1938, F",
+									"    var jsonData = pm.response.json();",
+									"    var entry = jsonData.entry[0].resource; ",
+									"        pm.expect(entry.name[0].family).to.eql(\"ALIZADEH\") && ",
+									"            pm.expect(entry.name[0].given[0]).to.eql(\"MUZNA\") && ",
+									"                pm.expect(entry.birthDate).to.eql(\"1983-07-19\") && ",
+									"                    pm.expect(entry.gender).to.eql(\"female\");",
+									"});",
+									"",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "content-type",
+								"type": "text",
+								"value": "application/fhir+json"
+							},
+							{
+								"key": "accept",
+								"type": "text",
+								"value": "application/fhir+json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{proxy_server_address}}{{base_fhir_path}}/Patient?family=ALIZADEH&gender=female",
+							"host": [
+								"{{proxy_server_address}}{{base_fhir_path}}"
+							],
+							"path": [
+								"Patient"
+							],
+							"query": [
+								{
+									"key": "family",
+									"value": "ALIZADEH"
+								},
+								{
+									"key": "gender",
+									"value": "female"
+								}
 							]
 						}
 					},
