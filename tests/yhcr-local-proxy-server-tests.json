@@ -1073,7 +1073,7 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "{{proxy_server_address}}{{base_fhir_path}}/Patient?identifier=https://fhir.nhs.uk/Id/nhs-number|9657702070&_include=Patient:generalPractitioner",
+							"raw": "{{proxy_server_address}}{{base_fhir_path}}/Patient?identifier=https://fhir.nhs.uk/Id/nhs-number|9657702070&_include=Patient:general-practitioner",
 							"host": [
 								"{{proxy_server_address}}{{base_fhir_path}}"
 							],
@@ -1087,7 +1087,7 @@
 								},
 								{
 									"key": "_include",
-									"value": "Patient:generalPractitioner"
+									"value": "Patient:general-practitioner"
 								}
 							]
 						}
@@ -1183,7 +1183,7 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "{{proxy_server_address}}{{base_fhir_path}}/Patient?identifier=https://fhir.nhs.uk/Id/nhs-number|9657702070&_include=Patient:Organization",
+							"raw": "{{proxy_server_address}}{{base_fhir_path}}/Patient?identifier=https://fhir.nhs.uk/Id/nhs-number|9657702070&_include=Patient:organization",
 							"host": [
 								"{{proxy_server_address}}{{base_fhir_path}}"
 							],
@@ -1197,7 +1197,7 @@
 								},
 								{
 									"key": "_include",
-									"value": "Patient:Organization"
+									"value": "Patient:organization"
 								}
 							]
 						}
@@ -1245,16 +1245,37 @@
 									"    pm.expect(entry.resourceType).to.eql(\"Patient\");",
 									"});",
 									"//Expectation: A Practitioner Resource is at the second index in the entries collection...",
-									"pm.test(\"Test Patient 9657702070 - Bundle entry[1] is a Practitioner FHIR Resource\", function () {",
+									"pm.test(\"Test Patient 9657702070 - Bundle entry contains a Practitioner FHIR Resource\", function () {",
 									"    var jsonData = pm.response.json();",
-									"    var entry = jsonData.entry[1].resource;",
-									"    pm.expect(entry.resourceType).to.eql(\"Practitioner\");",
+									"    ",
+									"    var entries = jsonData.entry;",
+									"    var practitionerPresent = false;",
+									"    ",
+									"    entries.forEach(function(entry) {",
+									"        if(entry.resource.resourceType === 'Organization')",
+									"        {",
+									"             organisationPresent = true;",
+									"        }",
+									"    });",
+									"    ",
+									"    pm.expect(organisationPresent).to.be.true;",
 									"});",
 									"//Expectation: Practitioner Resource bundle entry search mode === include...",
 									"pm.test(\"Test Patient 9657702070 - Practitioner Resource bundle entry mode === 'include'\", function () {",
 									"    var jsonData = pm.response.json();",
-									"    var entry = jsonData.entry[1];",
-									"    pm.expect(entry.search.mode).to.eql(\"include\")",
+									"    ",
+									"    var entries = jsonData.entry;",
+									"    var searchMode;",
+									"    ",
+									"    entries.forEach(function(entry) {",
+									"        if(entry.resource.resourceType === 'Practitioner')",
+									"        {",
+									"             searchMode = entry.search.mode;",
+									"        }",
+									"    });",
+									"    ",
+									"    pm.expect(searchMode).to.eql(\"include\")",
+									"    ",
 									"});",
 									"//Expectation: Practitioner Resource logical ID is exactly equal to that referenced by Patient Resource...",
 									"pm.test(\"Test Patient 9657702070 - Practitioner Resource logical ID is exactly equal to that referenced by Patient Resource\", function () {",
@@ -1263,23 +1284,53 @@
 									"    ",
 									"    var patient = jsonData.entry[0].resource;",
 									"    var patientPractitionerReference = patient.generalPractitioner[0].reference;",
-									"    var practitioner = jsonData.entry[1].resource;",
-									"    var practitionerId = 'Practitioner/' + practitioner.id;",
+									"    ",
+									"    var entries = jsonData.entry;",
+									"    var practitionerId;",
+									"    ",
+									"    entries.forEach(function(entry) {",
+									"        if(entry.resource.resourceType === 'Practitioner')",
+									"        {",
+									"             var practitioner = entry.resource;",
+									"             practitionerId = 'Practitioner/' + practitioner.id;",
+									"        }",
+									"    });",
 									"    ",
 									"    pm.expect(practitionerId).to.eql(patientPractitionerReference);",
 									"});",
 									"",
 									"//Expectation: An Organization Resource is at the third index in the entries collection...",
-									"pm.test(\"Test Patient 9657702070 - Bundle entry[2] is an Organization FHIR Resource\", function () {",
+									"pm.test(\"Test Patient 9657702070 - Bundle contains an Organization FHIR Resource\", function () {",
 									"    var jsonData = pm.response.json();",
-									"    var entry = jsonData.entry[2].resource;",
-									"    pm.expect(entry.resourceType).to.eql(\"Organization\");",
+									"    ",
+									"    var entries = jsonData.entry;",
+									"    var organisationPresent = false;",
+									"    ",
+									"    entries.forEach(function(entry) {",
+									"        if(entry.resource.resourceType === 'Organization')",
+									"        {",
+									"             organisationPresent = true;",
+									"        }",
+									"    });",
+									"    ",
+									"    pm.expect(organisationPresent).to.be.true;",
 									"});",
 									"//Expectation: Organization Resource bundle entry search mode === include...",
 									"pm.test(\"Test Patient 9657702070 - Organization Resource bundle entry mode === 'include'\", function () {",
 									"    var jsonData = pm.response.json();",
-									"    var entry = jsonData.entry[2];",
-									"    pm.expect(entry.search.mode).to.eql(\"include\")",
+									"    ",
+									"    var entries = jsonData.entry;",
+									"    var searchMode;",
+									"    ",
+									"    entries.forEach(function(entry) {",
+									"        if(entry.resource.resourceType === 'Organization')",
+									"        {",
+									"             searchMode = entry.search.mode;",
+									"        }",
+									"    });",
+									"    ",
+									"    pm.expect(searchMode).to.eql(\"include\")",
+									"    ",
 									"});",
 									"//Expectation: Organization Resource logical ID is exactly equal to that referenced by Patient Resource...",
 									"pm.test(\"Test Patient 9657702070 - Organization Resource logical ID is exactly equal to that referenced by Patient Resource\", function () {",
@@ -1288,8 +1339,17 @@
 									"    ",
 									"    var patient = jsonData.entry[0].resource;",
 									"    var patientOrganizationReference = patient.managingOrganization.reference;",
-									"    var organization = jsonData.entry[2].resource;",
-									"    var organizationId = 'Organization/' + organization.id;",
+									"    ",
+									"    var entries = jsonData.entry;",
+									"    var organizationId;",
+									"    ",
+									"    entries.forEach(function(entry) {",
+									"        if(entry.resource.resourceType === 'Organization')",
+									"        {",
+									"             var organization = entry.resource;",
+									"             organizationId = 'Organization/' + organization.id;",
+									"        }",
+									"    });",
 									"    ",
 									"    pm.expect(organizationId).to.eql(patientOrganizationReference);",
 									"});",
@@ -1318,7 +1378,7 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "{{proxy_server_address}}{{base_fhir_path}}/Patient?identifier=https://fhir.nhs.uk/Id/nhs-number|9657702070&_include=Patient:Organization&_include=Patient:general-Practitioner",
+							"raw": "{{proxy_server_address}}{{base_fhir_path}}/Patient?identifier=https://fhir.nhs.uk/Id/nhs-number|9657702070&_include=Patient:organization&_include=Patient:general-practitioner",
 							"host": [
 								"{{proxy_server_address}}{{base_fhir_path}}"
 							],
@@ -1332,11 +1392,11 @@
 								},
 								{
 									"key": "_include",
-									"value": "Patient:Organization"
+									"value": "Patient:organization"
 								},
 								{
 									"key": "_include",
-									"value": "Patient:general-Practitioner"
+									"value": "Patient:general-practitioner"
 								}
 							]
 						}
